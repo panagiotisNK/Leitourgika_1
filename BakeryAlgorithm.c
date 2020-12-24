@@ -16,7 +16,9 @@ void lock(int thread) {
     choosing[thread] = 1;
     MEMBAR;
     int max_ticket = 0;
-    for (int i = 0; i < THREAD_COUNT; ++i) {
+    int i;
+    int other;
+    for ( i = 0; i < THREAD_COUNT; ++i) {
         int ticket = tickets[i];
         max_ticket = ticket > max_ticket ? ticket : max_ticket;
     }
@@ -24,7 +26,7 @@ void lock(int thread) {
     MEMBAR;
     choosing[thread] = 0;
     MEMBAR;
-    for (int other = 0; other < THREAD_COUNT; ++other) {
+    for ( other = 0; other < THREAD_COUNT; ++other) {
         while (choosing[other]) { }
         MEMBAR;
         while (tickets[other] != 0 &&
@@ -64,12 +66,14 @@ int main(int argc, char **argv) {
     resource = 0;
 
     pthread_t threads[THREAD_COUNT];
+    
+    int i;
 
-    for (int i = 0; i < THREAD_COUNT; ++i) {
+    for (i = 0; i < THREAD_COUNT; ++i) {
         pthread_create(&threads[i], NULL, &thread_body, (void*)((long)i));
     }
 
-    for (int i = 0; i < THREAD_COUNT; ++i) {
+    for ( i = 0; i < THREAD_COUNT; ++i) {
         pthread_join(threads[i], NULL);
     }
 
