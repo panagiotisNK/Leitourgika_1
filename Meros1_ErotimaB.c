@@ -9,6 +9,7 @@
 struct func_args
 {
 	long int array_iteration;
+	long int array_size;
 	long int *array;
 };
 
@@ -25,7 +26,7 @@ void unlock(long int iteration);
 volatile long int *tokens;
 volatile long int *choice;
 
-volatile long int resource;
+volatile long int resources;
 
 
 int main()
@@ -33,9 +34,9 @@ int main()
     long int process_num;
 	long int i;
     
-    resource = 0;
+    resources = 0;
 	
-	printf("Insert the number of threads you wish to be created:\n");
+	printf("Insert the number of threads you wish to create:\n");
     scanf("%ld",&process_num);	
     
 	while(process_num<=0)
@@ -52,12 +53,13 @@ int main()
     printf("Creating Shared Array...\n");
     sleep(1);
     printf("Shared Array:\n");
-    printf("{\n");
+    printf("{");
 
    
   struct func_args SharedArray ;
   
   SharedArray.array = malloc(process_num * sizeof(long int));
+  SharedArray.array_size = process_num;
   
     
     for (i=0;i<process_num;i++)
@@ -68,9 +70,10 @@ int main()
 
     for (i=0;i<process_num;i++)
    {
- 	printf("%ld\n",SharedArray.array[i]);
+ 	printf("%ld,",SharedArray.array[i]);
    }
-
+    
+	printf("\b");
     printf("}\n");
     printf("\n\nPress Enter to Continue...\n");
     
@@ -78,11 +81,9 @@ int main()
 	
     system("cls");
     printf("Now updating the cells of the Shared Array...\n");
-    sleep(1);
-    printf("(increasing each one by i,where i is each thread's id)\n");
+   
     sleep(2);
-    printf("Shared Array:\n");
-    printf("{\n");
+   
 
 
 	pthread_t thread_var[process_num];
@@ -95,7 +96,7 @@ int main()
 		pthread_join(thread_var[i],NULL);
 	}
 	
-	printf("}");
+
 	
 free(SharedArray.array);
 
@@ -155,20 +156,33 @@ void unlock(long int iteration)
 
 void SA_update(struct func_args Arg)
 {
- if (resource != 0)
+ if (resources != 0)
 	    {
-        printf("Resources were requested by thread number %d, but they are still occupied by thread number %d!\n",Arg.array_iteration, resource);
+        printf("Resources were requested by thread number %d, but they are still occupied by thread number %d!\n",Arg.array_iteration, resources);
         }
     
-	resource = Arg.array_iteration;
+	resources = Arg.array_iteration;
 	
-	Arg.array[Arg.array_iteration] = Arg.array[Arg.array_iteration] + Arg.array_iteration;
+	long int i;
 	
-	printf("%ld\n",Arg.array[Arg.array_iteration]);
-
+	for (i=0; i<Arg.array_size ;i++)
+	{
+	Arg.array[i] = Arg.array[i] + Arg.array_iteration;
+    }
+    
+    printf("Shared Array after i=%ld:\n",Arg.array_iteration);
+    printf("{");
+    
+	for (i=0; i<Arg.array_size ;i++)
+    {
+    	printf("%ld,",Arg.array[i]);
+	}
+	printf("\b");
+	printf("}\n");
+	
 	BARRIER;
 	
 	sleep(1);
 	
-	resource = 0;
+	resources = 0;
 }
