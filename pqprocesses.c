@@ -13,22 +13,22 @@ void *p(void *arg){
 	system("date");
 	
 	//E5: show the calendar
-	printf("E5:\n");
+	printf("\nE5:\n");
 	system("cal");
 	
 	//E8: show a list of files and directories
-	printf("E8:\n");
+	printf("\nE8:\n");
 	system("ls -l");
 	
 	sem_post(&sq);
 	sem_wait(&sp);
 	
 	//E9: show how many hours the current pc is on
-	printf("E9:\n");
+	printf("\nE9:\n");
 	system("uptime");
 	
 	//E7: show user's info (username)
-	printf("E7:\n");
+	printf("\nE7:\n");
 	system("whoami");
 	
 	sem_post(&sq);
@@ -39,22 +39,22 @@ void *q(void *arg){
 	sem_wait(&sq);
 	
 	//E2: show the list of processes
-	printf("E2:\n");
+	printf("\nE2:\n");
 	system("ps -l");
 	
 	//E3: show RAM
-	printf("E3:\n");
+	printf("\nE3:\n");
 	system("free -h");
 	
 	//E6:
-	printf("E6:\n");
-	system("");
+	printf("\nE6:\n");
+	system("echo 'hello'");
 	
 	sem_post(&sp);
 	sem_wait(&sq);
 	
 	//E4: show kernel info
-	printf("E4:\n");
+	printf("\nE4:\n");
 	system("uname -a");
 }
 
