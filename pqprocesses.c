@@ -8,28 +8,29 @@ sem_t sq;
 sem_t sp;
 
 void *p(void *arg){
-	//E1: print the date
-//	system("date");
-	printf("E1\n");
-		
+	//E1: print the date, set an new date
+	printf("E1:\n");
+	system("date");
+	
 	//E5: show the calendar
-//	system("calendar");
-	printf("E5\n");
+	printf("E5:\n");
+	system("calendar");
 	
 	//E8: show a list of files and directories
-//	system("ls -l");
-	printf("E8\n");
+	printf("E8:\n");
+	system("ls -l");
 	
 	sem_post(&sq);
 	sem_wait(&sp);
 	
 	//E9:
-	//system("");
-	printf("E9\n");
+	printf("E9:\n");
+	system("");
 	
 	//E7:
-	//system("");
-	printf("E7\n");
+	printf("E7:\n");
+	system("");
+	
 	sem_post(&sq);
 }
 
@@ -38,16 +39,23 @@ void *q(void *arg){
 	sem_wait(&sq);
 	
 	//E2: show the list of processes
-	//system("ps -l");
-	printf("E2\n");
+	printf("E2:\n");
+	system("ps -l");
+	
 	//E3: 
-	printf("E3\n");
+	printf("E3:\n");
+	system("");
+	
 	//E6:
-	printf("E6\n");
+	printf("E6:\n");
+	system("");
+	
 	sem_post(&sp);
 	sem_wait(&sq);
-	//E4
-	printf("E4\n");
+	
+	//E4:
+	printf("E4:\n");
+	system("");
 }
 
 
