@@ -8,13 +8,13 @@ sem_t sq;
 sem_t sp;
 
 void *p(void *arg){
-	//E1: print the date, set an new date
+	//E1: print the date
 	printf("E1:\n");
 	system("date");
 	
 	//E5: show the calendar
 	printf("E5:\n");
-	system("calendar");
+	system("cal");
 	
 	//E8: show a list of files and directories
 	printf("E8:\n");
@@ -23,13 +23,13 @@ void *p(void *arg){
 	sem_post(&sq);
 	sem_wait(&sp);
 	
-	//E9:
+	//E9: show how many hours the current pc is on
 	printf("E9:\n");
-	system("");
+	system("uptime");
 	
-	//E7:
+	//E7: show user's info (username)
 	printf("E7:\n");
-	system("");
+	system("whoami");
 	
 	sem_post(&sq);
 }
@@ -42,9 +42,9 @@ void *q(void *arg){
 	printf("E2:\n");
 	system("ps -l");
 	
-	//E3: 
+	//E3: show RAM
 	printf("E3:\n");
-	system("");
+	system("free -h");
 	
 	//E6:
 	printf("E6:\n");
@@ -53,9 +53,9 @@ void *q(void *arg){
 	sem_post(&sp);
 	sem_wait(&sq);
 	
-	//E4:
+	//E4: show kernel info
 	printf("E4:\n");
-	system("");
+	system("uname -a");
 }
 
 
