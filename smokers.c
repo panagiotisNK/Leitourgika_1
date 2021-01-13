@@ -16,7 +16,7 @@ sem_t smokerSem[3];
 // This is an array of strings describing what each type of smoker needs
 char* smokerType[3] = { "matches & tobacco","matches & paper","tobacco & paper"};
 
-// This list represents item types that are on the table. This should corrispond with the smoker_types, such that each item is the one the smoker has. So the first item would be paper, then tobacco, then matches.
+// This list represents item types that are on the table. This should corrispond with the smokerTypes, such that each item is the one the smoker has. So the first item would be paper, then tobacco, then matches.
 bool itemsOnTable[3] = { false, false, false };
 
 // Each pusher pushes a certian type item, manage these with this semaphore
