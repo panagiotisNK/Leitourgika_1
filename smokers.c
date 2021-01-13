@@ -7,196 +7,183 @@
 #include <unistd.h>
 #include <time.h>
 
-// An agent semaphore represents items on the table
-sem_t agent_ready;
+// A seller semaphore represents that the seller left two items on the table
+sem_t sellerSem;
 
 // Each smoker semaphore represents when a smoker has the items they need
-sem_t smoker_semaphors[3];
+sem_t smokerSem[3];
 
-// This is an array of strings describing what each smoker type needs
-char* smoker_types[3] = { "matches & tobacco","matches & paper","tobacco & paper"};
+// This is an array of strings describing what each type of smoker needs
+char* smokerType[3] = { "matches & tobacco","matches & paper","tobacco & paper"};
 
-// This list represents item types that are on the table. This should corrispond
-// with the smoker_types, such that each item is the one the smoker has. So the
-// first item would be paper, then tobacco, then matches.
-bool items_on_table[3] = { false, false, false };
+// This list represents item types that are on the table. This should corrispond with the smoker_types, such that each item is the one the smoker has. So the first item would be paper, then tobacco, then matches.
+bool itemsOnTable[3] = { false, false, false };
 
 // Each pusher pushes a certian type item, manage these with this semaphore
-sem_t pusher_semaphores[3];
+sem_t pushSem[3];
 
-/**
-* Smoker function, handles waiting for the item’s that they need, and then
-* smoking. Repeat this three times
-*/
-void* smoker(void* arg)
-{
-int smoker_id = *(int*) arg;
-int type_id = smoker_id % 3;
+//Smoker function, handles waiting for the item’s that they need, and then smoking. Repeat this three times
 
-// Smoke 3 times
-for (int i = 0; i < 3; ++i)
-{
-printf("Smoker %d Waiting for %s\n",
-smoker_id, smoker_types[type_id]);
+void* smoker(void* arg){
+	
+	int sId = *(int*) arg;
+	int typeId = sId % 3;
 
-// Wait for the proper combination of items to be on the table
-sem_wait(&smoker_semaphors[type_id]);
+	// Smoke 3 times
+	int i;
+	for(i = 0; i < 3; ++i){
+		printf("Smoker %d Waiting for %s\n",
+		sId, smokerType[typeId]);
 
-// Make the cigarette before releasing the agent
-//printf("Smoker %d Now making a cigarette\n", smoker_id);
-//sleep(1);
-//sem_post(&agent_ready);
+		// Wait for the proper combination of items to be on the table
+		sem_wait(&smokerSem[typeId]);
 
-// We’re smoking now
-printf("Smoker %d Now smoking\n", smoker_id);
-sleep(1);
-sem_post(&agent_ready);
+		// Make the cigarette and smoke before releasing the seller semaphore
+		printf("Smoker %d Now making a cigarette\n", sId);
+		printf("Smoker %d Now smoking\n", sId);
+		sleep(1);
+		sem_post(&sellerSem);
+		}
+
+	return NULL;
+	
 }
 
-return NULL;
-}
 
 // This semaphore gives the pusher exclusive access to the items on the table
-sem_t pusher_lock;
+sem_t pusherLock;
 
-/**
-* The pusher is responsible for releasing the proper smoker semaphore when the
-* right item’s are on the table.
-*/
-void* pusher(void* arg)
-{
-int pusher_id = *(int*) arg;
 
-for (int i = 0; i < 12; ++i)
-{
-// Wait for this pusher to be needed
-sem_wait(&pusher_semaphores[pusher_id]);
-sem_wait(&pusher_lock);
+//The pusher is responsible for releasing the proper smoker semaphore when the right item’s are on the table.
 
-// Check if the other item we need is on the table
-if (items_on_table[(pusher_id + 1) % 3])
-{
-items_on_table[(pusher_id + 1) % 3] = false;
-sem_post(&smoker_semaphors[(pusher_id + 2) % 3]);
-}
-else if (items_on_table[(pusher_id + 2) % 3])
-{
-items_on_table[(pusher_id + 2) % 3] = false;
-sem_post(&smoker_semaphors[(pusher_id + 1) % 3]);
-}
-else
-{
-// The other item’s aren’t on the table yet
-items_on_table[pusher_id] = true;
-}
+void* pusher(void* arg){
+	
+	int pushId = *(int*) arg;
+	
+	int i;
+	for(i = 0; i < 12; ++i){
+		// Wait for this pusher to be needed
+		sem_wait(&pushSem[pushId]);	
+		sem_wait(&pusherLock);
 
-sem_post(&pusher_lock);
-}
+		// Check if the other item we need is on the table
+		if(itemsOnTable[(pushId + 1) % 3]){
+			itemsOnTable[(pushId + 1) % 3] = false;
+			sem_post(&smokerSem[(pushId + 2) % 3]);
+		}
+		else if(itemsOnTable[(pushId + 2) % 3]){
+			itemsOnTable[(pushId + 2) % 3] = false;
+			sem_post(&smokerSem[(pushId + 1) % 3]);
+		}
+		else{
+			// The other item’s aren’t on the table yet
+			itemsOnTable[pushId] = true;
+		}
 
-return NULL;
+		sem_post(&pusherLock);
+		
+	}
+
+	return NULL;
+	
 }
 
-/**
-* The agent puts items on the table
-*/
-void* agent(void* arg)
-{
-int agent_id = *(int*) arg;
 
-for (int i = 0; i < 3; ++i)
-{
-sleep(1);
+//The seller puts two items on the table
 
-// Wait for a lock on the agent
-sem_wait(&agent_ready);
+void* seller(void* arg){
+	
+	int sellId = *(int*) arg;
 
-// Release the items this agent gives out
-sem_post(&pusher_semaphores[agent_id]);
-sem_post(&pusher_semaphores[(agent_id + 1) % 3]);
+	int i;
+	for(i = 0; i < 3; ++i){
+		sleep(1);
 
-// Say what type of items we just put on the table
-printf("Agent  giving out %s\n",smoker_types[(agent_id + 2) % 3]);
+		// Wait for a lock on the seller
+		sem_wait(&sellerSem);
+
+		// Release the items this seller gives out
+		sem_post(&pushSem[sellId]);
+		sem_post(&pushSem[(sellId + 1) % 3]);
+
+		// Say what type of items we just put on the table
+		printf("Seller giving out %s\n", smokerType[(sellId + 2) % 3]);
+	}
+
+	return NULL;
+	
 }
 
-return NULL;
-}
 
-/**
-* The main thread handles the agent’s arbitration of items.
-*/
-int main(int argc, char* arvg[])
-{
-// Seed our random number since we will be using random numbers
-srand(time(NULL));
+//The main thread handles the agent’s arbitration of items.
 
-// There is only one agent semaphore since only one set of items may be on
-// the table at any given time. A values of 1 = nothing on the table
-sem_init(&agent_ready, 0, 1);
+int main(int argc, char* arvg[]){
+	
+	// Seed our random number since we will be using random numbers
+	srand(time(NULL));
 
-// Initalize the pusher lock semaphore
-sem_init(&pusher_lock, 0, 1);
+	// There is only one seller semaphore since only one set of items may be on the table at any given time. A values of 1 = nothing on the table
+	sem_init(&sellerSem, 0, 1);
 
-// Initialize the semaphores for the smokers and pusher
-for (int i = 0; i < 3; ++i)
-{
-sem_init(&smoker_semaphors[i], 0, 0);
-sem_init(&pusher_semaphores[i], 0, 0);
-}
+	// Initalize the pusher lock semaphore
+	sem_init(&pusherLock, 0, 1);
 
-// Smoker ID’s will be passed to the threads. Allocate the ID’s on the stack
-int smoker_id[3];
+	// Initialize the semaphores for the smokers and pusher
+	
+	int i;
+	for(i = 0; i < 3; ++i){
+		sem_init(&smokerSem[i], 0, 0);
+		sem_init(&pushSem[i], 0, 0);
+	}
 
-pthread_t smoker_thread[3];
+	// Smoker ID’s will be passed to the threads. Allocate the ID’s on the stack
+	int sId[3];
 
-// Create the 6 smoker threads with IDs
-for (int i = 0; i < 3; ++i)
-{
-smoker_id[i] = i;
+	pthread_t smokerThread[3];
 
-if (pthread_create(&smoker_thread[i], NULL, smoker, &smoker_id[i]) == EAGAIN)
-{
-perror("Insufficient resources to create thread");
-return 0;
-}
-}
+	// Create the 6 smoker threads with IDs
+	for(i = 0; i < 3; ++i){
+		sId[i] = i;
 
-// Pusher ID’s will be passed to the threads. Allocate the ID’s on the stack
-int pusher_id[3];
+		if(pthread_create(&smokerThread[i], NULL, smoker, &sId[i]) == EAGAIN){
+			perror("Insufficient resources to create thread");
+			return 0;
+		}
+	}
 
-pthread_t pusher_thread[3];
+	// Pusher ID’s will be passed to the threads. Allocate the ID’s on the stack
+	int pushId[3];
 
-for (int i = 0; i < 3; ++i)
-{
-pusher_id[i] = i;
+	pthread_t pusherThread[3];
 
-if (pthread_create(&pusher_thread[i], NULL, pusher, &pusher_id[i]) == EAGAIN)
-{
-perror("Insufficient resources to create thread");
-return 0;
-}
-}
+	for(i = 0; i < 3; ++i){
+		pushId[i] = i;
 
-// Agent ID’s will be passed to the threads. Allocate the ID’s on the stack
-int agent_id[3];
+		if(pthread_create(&pusherThread[i], NULL, pusher, &pushId[i]) == EAGAIN){
+			perror("Insufficient resources to create thread");
+			return 0;
+		}
+	}
 
-pthread_t agent_thread[3];
+	// Seller's ID will be passed to the threads. Allocate the IDs on the stack
+	int sellId[3];
 
-for (int i = 0; i < 3; ++i)
-{
-agent_id[i] =i;
+	pthread_t sellerThread[3];
 
-if (pthread_create(&agent_thread[i], NULL, agent, &agent_id[i]) == EAGAIN)
-{
-perror("Insufficient resources to create thread");
-return 0;
-}
-}
+	for(i = 0; i < 3; ++i){
+		sellId[i] =i;
 
-// Make sure all the smokers are done smoking
-for (int i = 0; i < 3; ++i)
-{
-pthread_join(smoker_thread[i], NULL);
-}
+		if(pthread_create(&sellerThread[i], NULL, seller, &sellId[i]) == EAGAIN){
+			perror("Insufficient resources to create thread");
+			return 0;
+		}
+	}
 
-return 0;
+	// Make sure all the smokers are done smoking
+	for(i = 0; i < 3; ++i){
+		pthread_join(smokerThread[i], NULL);
+	}
+
+	return 0;
+	
 }
