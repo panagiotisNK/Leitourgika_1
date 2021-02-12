@@ -195,6 +195,7 @@ CREATE TABLE Logs(
 
 
 INSERT INTO User VALUES
+('panic'. '87654', 'Panagiotis', 'Nikolaidis', '2014-04-01 00:00:00 PM', 'panic@gmail.com'),
 ('kpap', '12345', 'Kostas', 'Papageorgiou', '2019-09-17 00:00:00 PM', 'kpap@gmail.com'),
 ('maalex', '23456', 'Maria', 'Alexopoulou', '2017-05-30 00:00:00 PM', 'maalex@gmail.com'),
 ('anamakri', '34567', 'Anastasia', 'Makri', '2014-07-12 00:00:00 PM', 'anamakri@gmail.com'),
@@ -207,6 +208,9 @@ INSERT INTO User VALUES
 INSERT INTO Company VALUES
 ('556783340', 'A PATRWN', 'Drymot', '2610743892', 'Maizonos', 125, 'Patras', 'Greece'),
 ('875835632', 'B ATHINWN', 'Telem', '2108342954', 'Kanakari', 204, 'Athens', 'Greece');
+
+INSERT INTO Administrator VALUES
+('panic');
 
 INSERT INTO Employee VALUES
 ('kpap', 'Software Engineer', 'Sistatiki', 'Certificate', 'Aw1'),
@@ -230,8 +234,20 @@ INSERT INTO Job VALUES
 (NULL, '2021-03-07', 1600.00, 'Web Developer', 'Telem', 'jlazari', '2020-12-05', '2021-01-05');
 
 INSERT INTO Job_field VALUES
-(''),
-('Beverage quality check','Test the quality of the products of the company',)
+('Beverage quality check','Test the quality of the products of the company'),
+('Web Developer', 'Create and check the website of a company');
+
+INSERT INTO Job_needs VALUES
+('1', 'Beverage quality check'),
+('2', 'Web Developer');
+
+INSERT INTO Evaluation_Request VALUES
+('anamakri', 'Oinologos'),
+('kpap', 'Web Developer');
+
+INSERT INTO Evaluation_parts VALUES
+('anamakri', 2, 'sdem', 2, 'Agxwmenh, arketa kleisth, wstoso edwse swstes apanthseis', 3, 4, NULL),
+('kpap', 3, 'jlazari', 3, 'Koinwnikos, me autopepoithisi, kales apanthseis', 3, 4, NULL);
 
 INSERT INTO Degree VALUES
 ('Computer Science', 'University of Ioannina', 'UNIVERSITY'),
