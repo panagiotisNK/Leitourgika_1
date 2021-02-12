@@ -195,7 +195,7 @@ CREATE TABLE Logs(
 
 
 INSERT INTO User VALUES
-('panic'. '87654', 'Panagiotis', 'Nikolaidis', '2014-04-01 00:00:00 PM', 'panic@gmail.com'),
+('panic', '87654', 'Panagiotis', 'Nikolaidis', '2014-04-01 00:00:00 PM', 'panic@gmail.com'),
 ('kpap', '12345', 'Kostas', 'Papageorgiou', '2019-09-17 00:00:00 PM', 'kpap@gmail.com'),
 ('maalex', '23456', 'Maria', 'Alexopoulou', '2017-05-30 00:00:00 PM', 'maalex@gmail.com'),
 ('anamakri', '34567', 'Anastasia', 'Makri', '2014-07-12 00:00:00 PM', 'anamakri@gmail.com'),
@@ -339,7 +339,7 @@ DROP PROCEDURE IF EXISTS updateResult;
 DELIMITER $
 CREATE PROCEDURE updateResult(jid INT(4), evuname VARCHAR(12))
 BEGIN
-    DECLARE summ REAL CHECK (sum_grade>0 AND sum_grade<10);
+    DECLARE summ REAL;
     
     DECLARE not_found INT;
 
@@ -387,7 +387,7 @@ BEGIN
 
     OPEN scursor;
     REPEAT
-        FETCH scursor INTO emuname
+        FETCH scursor INTO emuname;
         IF(not_found = 0)
         THEN
             PRINT "Oristikopoihmenoi pinakes:";
