@@ -392,7 +392,8 @@ BEGIN
         THEN
             PRINT "Oristikopoihmenoi pinakes:";
             SELECT * FROM Evaluation_results
-            WHERE Job_Id = jjid AND em_username = emuname;
+            WHERE Job_Id = jjid AND em_username = emuname
+            ORDER BY Grade DESC;
 
             PRINT "Aksiologisi se ekseliksi...";
             PRINT "Ekremmoun:";
