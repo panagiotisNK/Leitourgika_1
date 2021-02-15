@@ -234,20 +234,20 @@ INSERT INTO Job VALUES
 (NULL, '2021-03-07', 1600.00, 'Web Developer', 'Telem', 'jlazari', '2020-12-05', '2021-01-05');
 
 INSERT INTO Job_field VALUES
-('Beverage quality check','Test the quality of the products of the company'),
-('Web Developer', 'Create and check the website of a company');
+('Beverage quality check','Check the products of the company', NULL),
+('Web Developer', 'Create and check the website of a company', NULL);
 
 INSERT INTO Job_needs VALUES
 ('1', 'Beverage quality check'),
 ('2', 'Web Developer');
 
 INSERT INTO Evaluation_Request VALUES
-('anamakri', 'Oinologos'),
-('kpap', 'Web Developer');
+('anamakri', 1),
+('kpap', 2);
 
 INSERT INTO Evaluation_parts VALUES
-('anamakri', 2, 'sdem', 2, 'Agxwmenh, arketa kleisth, wstoso edwse swstes apanthseis', 3, 4, NULL),
-('kpap', 3, 'jlazari', 3, 'Koinwnikos, me autopepoithisi, kales apanthseis', 3, 4, NULL);
+('anamakri', 1, 'sdem', 2, 'Agxwmenh, arketa kleisth, wstoso edwse swstes apanthseis', 3, 1, NULL),
+('kpap', 2, 'jlazari', 3, 'Koinwnikos, me autopepoithisi, kales apanthseis', 3, 1, NULL);
 
 INSERT INTO Degree VALUES
 ('Computer Science', 'University of Ioannina', 'UNIVERSITY'),
@@ -390,13 +390,13 @@ BEGIN
         FETCH scursor INTO emuname;
         IF(not_found = 0)
         THEN
-            PRINT "Oristikopoihmenoi pinakes:";
+            SELECT 'Oristikopoihmenoi pinakes:';
             SELECT * FROM Evaluation_results
             WHERE Job_Id = jjid AND em_username = emuname
             ORDER BY Grade DESC;
 
-            PRINT "Aksiologisi se ekseliksi...";
-            PRINT "Ekremmoun:";
+            SELECT 'Aksiologisi se ekseliksi...';
+            SELECT 'Ekremmoun:';
             SELECT count(*) FROM Evaluation_Request
             WHERE JobID = jjid AND empl_username = emuname;
         END IF;
@@ -452,7 +452,7 @@ INSERT INTO Logs(log)
 VALUES ('The Job with the id of '+@OLD.id_of_job+' has now the id of '+@NEW.id_of_job+' . There might be some other changes too.');
 ELSE
 INSERT INTO Logs(log)
-VALUES('A Job with the id of '+ @id_of_job +' was updated in the table "Job".');
+VALUES('A Job with the id of '+ @NEW.id_of_job +' was updated in the table "Job".');
 END IF;
 END $
 DELIMITER ; 
