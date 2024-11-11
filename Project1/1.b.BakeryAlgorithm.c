@@ -7,6 +7,7 @@
 
 #define THREAD_COUNT 8
 
+
 volatile int tickets[THREAD_COUNT];
 volatile int choosing[THREAD_COUNT];
 
